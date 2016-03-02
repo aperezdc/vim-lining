@@ -2,7 +2,7 @@
 " License: GPLv3
 
 if exists('g:loaded_lining_autoload')
-	finish
+  finish
 endif
 let g:loaded_lining_autoload = 1
 
@@ -11,11 +11,11 @@ set cpo&vim
 
 
 function lining#color(active, group, content)
-	if a:active
-		return '%#' . a:group . '#' . a:content . '%#StatusLine#'
-	else
-		return a:content
-	endif
+  if a:active
+    return '%#' . a:group . '#' . a:content . '%#StatusLine#'
+  else
+    return a:content
+  endif
 endfunction
 
 

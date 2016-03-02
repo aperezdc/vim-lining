@@ -1,5 +1,8 @@
 # vim-lining
 
+Small and cute status line for [Vim](http://www.vim.org) and
+[NeoVim](https://neovim.io).
+
 ![Screenshot](/_misc/screenshot.png)
 
 (The screenshot uses the [elrond

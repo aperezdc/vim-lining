@@ -5,6 +5,35 @@
 (The screenshot uses the [elrond
 theme](https://github.com/aperezdc/vim-elrond).)
 
+## Features
+
+* Possible, the smallest nice-looking status line which does not require you
+  to install patched fonts.
+* Visual paste mode indicator (not shown in screenshot).
+* If you have [Fugitive](https://github.com/tpope/vim-fugitive) installed, it
+  will be used to show information on Git repositories.
+
+
+## Customization
+
+Customization is not possible at the moment. Not easily, at least.
+
+
+## Theming
+
+Theming is done via highlight groups. Lining uses the following groups:
+
+* `StatusLine` and `StatusLineNC`, as used by the default status line.
+* `LiningBufName`: Name of the file in the buffer.
+* `LiningWarn`: Warning flag item.
+* `LiningError`: Error flag item.
+* `LiningItem`: Any other item in the status line.
+* `LiningVcsInfo`: Version control information.
+
+For an example on how to theme Lining using these, you can check the [elrond
+theme](https://github.com/aperezdc/vim-elrond).
+
+
 ## Installation
 
 ### Using [Plug](https://github.com/junegunn/vim-plug)

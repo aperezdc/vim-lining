@@ -24,7 +24,11 @@ Customization is not possible at the moment. Not easily, at least.
 
 ## Theming
 
-Theming is done via highlight groups. Lining uses the following groups:
+Theming is done via highlight groups. Note that *by default colors for Lining
+are not defined*, which means that your status line will be use the plain
+colors defined by your theme for `StatusLine` and `StatusLineNC`.
+
+Lining uses the following highlight groups:
 
 * `StatusLine` and `StatusLineNC`, as used by the default status line.
 * `LiningBufName`: Name of the file in the buffer.

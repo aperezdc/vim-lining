@@ -10,6 +10,8 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 set laststatus=2
+set showmode
+
 augroup lining
 	autocmd!
 	autocmd VimEnter,WinEnter,BufWinEnter * call lining#refresh()

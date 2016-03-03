@@ -3,7 +3,7 @@
 Small and cute status line for [Vim](http://www.vim.org) and
 [NeoVim](https://neovim.io).
 
-![Screenshot](/_misc/screenshot.png)
+![Screenshot](/_misc/screenshot2.png)
 
 (The screenshot uses the [elrond
 theme](https://github.com/aperezdc/vim-elrond).)

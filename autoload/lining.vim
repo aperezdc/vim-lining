@@ -30,7 +30,7 @@ function lining#status(winnum)
 
   if type ==# 'help'
     let fmt .= lining#color(active, 'LiningBufName', ' help ')
-    let fmt .= lining#color(active, 'LiningItem', ' ' . fnamemodify(name, ':t:r'))
+    let fmt .= lining#color(active, 'LiningItem', ' ' . fnamemodify(name, ':t:r') . ' ')
     return fmt
   endif
 

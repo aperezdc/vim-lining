@@ -168,20 +168,22 @@ function lining#status(winnum)
 
 	let i = 0
 	let n = len(s:left_items)
-	let last_color = ''
+	let last_color = -1
 	let start_color = 1
 
 	while i < n
 		let item = s:left_items[i]
 		let text = s:format(item, active)
 		if !empty(text)
-			let item_color = get(item, 'color', 'Item')
+			let hlgroup = 'Lining' . get(item, 'color', 'Item')
+			let item_color = synIDtrans(hlID(hlgroup))
 			if item_color == last_color
 				if start_color != 0
-					let fmt .= s:colorize(active, 'Lining' . item_color, '·')
+					let fmt .= s:colorize(active, hlgroup, '·')
 				endif
 				let start_color = 0
 			else
+				let last_color = item_color
 				let start_color = 1
 			endif
 			let fmt .= text
@@ -192,7 +194,7 @@ function lining#status(winnum)
 	let fmt .= '%='  " Switch to the right side
 
 	let i = len(s:right_items)
-	let last_color = ''
+	let last_color = -1
 	let start_color = 1
 
 	while i > 0
@@ -200,13 +202,15 @@ function lining#status(winnum)
 		let item = s:right_items[i]
 		let text = s:format(item, active)
 		if !empty(text)
-			let item_color = get(item, 'color', 'Item')
+			let hlgroup = 'Lining' . get(item, 'color', 'Item')
+			let item_color = synIDtrans(hlID(hlgroup))
 			if item_color == last_color
 				if start_color != 0
-					let fmt .= s:colorize(active, 'Lining' . item_color, '·')
+					let fmt .= s:colorize(active, hlgroup, '·')
 				endif
 				let start_color = 0
 			else
+				let last_color = item_color
 				let start_color = 1
 			endif
 			let fmt .= text

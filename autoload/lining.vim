@@ -88,7 +88,7 @@ function s:filename_item.format(item, active)
 	if empty(path)
 		return '%< %f '
 	endif
-	let path = fnamemodify(path, ':p:.:h')
+	let path = fnamemodify(path, ':p:~:.:h')
 	if path == '.'
 		let path = ' '
 	else

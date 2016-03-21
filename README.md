@@ -20,7 +20,49 @@ theme](https://github.com/aperezdc/vim-elrond).)
 
 ## Customization
 
-Customization is not possible at the moment. Not easily, at least.
+The built-in items cannot be removed, but it is possible to add new ones. For
+example, this will append one element to the *right* of the left part of the
+status line which shows the status of the
+[Pencil](https://github.com/reedes/vim-pencil) plugin:
+
+```vim
+call lining#left("%{empty(PencilMode()) ? 'none' : PencilMode()}", 'Item')
+```
+
+or, to prepend to the *left* of the right part of the status line:
+
+```vim
+call lining#right("%{empty(PencilMode()) ? 'none' : PencilMode()}", 'Item')
+```
+
+The first argument is either a `statusline` format specifier (like in the
+example above), or a `Dict` with a `format` function attribute. The item
+above could have been written as:
+
+```vim
+let s:pencil_item = {}
+function s:pencil_item.format(item, active)
+    return active ? PencilMode() : ''
+endfunction
+call lining#left(s:pencil_item, 'Item')
+```
+
+The arguments passed to the `.format()` function are the `Dict` item itself,
+and a boolean flag indicating whether the status bar being formatted belongs
+to an active buffer.
+
+Lining automatically adds spaces around non-empty items. To prevent this
+behaviour (and manage the spacing yourself), you need to use this second form
+of specifying items, and add a `nospace` attribute to the `Dict`:
+
+```vim
+let s:pencil_item = { 'nospace': 1 }
+" ...
+```
+
+The second argument to `lining#left()` is the item kind, and is optional—if
+omitted, `'Item'` is used by default. This kind determines the colouring of
+the element. See [#theming](theming) below for more details.
 
 
 ## Theming
@@ -29,7 +71,8 @@ Theming is done via highlight groups. Note that *by default colors for Lining
 are not defined*, which means that your status line will be use the plain
 colors defined by your theme for `StatusLine` and `StatusLineNC`.
 
-Lining uses the following highlight groups:
+The names of the highlight groups are the same as the names of the item kinds
+with the `Lining` prefix added:
 
 * `StatusLine` and `StatusLineNC`, as used by the default status line.
 * `LiningBufName`: Name of the file in the buffer.

@@ -84,10 +84,17 @@ endfunction
 " Buffer name
 let s:filename_item = { 'nospace': 1 }
 function s:filename_item.format(item, active)
-	if empty(expand('%'))
-		return ' %<%f '
+	let path = expand('%')
+	if empty(path)
+		return '%< %f '
 	endif
-	return s:colorize(a:active, 'LiningBufPath',  " %{fnamemodify(expand('%'),':p:.:h')}/%<")
+	let path = fnamemodify(path, ':p:.:h')
+	if path == '.'
+		let path = ' '
+	else
+		let path = ' ' . path . '/'
+	endif
+	return s:colorize(a:active, 'LiningBufPath', path . '%<')
 				\ . s:colorize(a:active, 'LiningBufName', '%t ')
 endfunction
 call lining#left(s:filename_item, 'BufName')

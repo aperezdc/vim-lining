@@ -159,8 +159,10 @@ function lining#status(winnum)
 	let name = bufname(bufnum)
 
 	if type ==# 'help'
-		let fmt .= s:colorize(active, 'LiningBufName', ' help ')
-		let fmt .= s:colorize(active, 'LiningItem', ' ' . fnamemodify(name, ':t:r') . ' ')
+		let fmt .= s:colorize(active, 'LiningBufPath', ' help/')
+		let fmt .= s:colorize(active, 'LiningBufName', fnamemodify(name, ':t:r') . ' ')
+		let fmt .= '%='  " Move to the right side
+		let fmt .= s:colorize(active, 'LiningLnCol', ' %P ')
 		return fmt
 	endif
 

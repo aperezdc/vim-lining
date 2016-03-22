@@ -154,13 +154,13 @@ if exists('*GitGutterGetHunkSummary')
 		let [hadd, hmod, hdel] = GitGutterGetHunkSummary()
 		let hunks = ''
 		if hmod > 0
-			let hunks = printf('~%i', hmod)
+			let hunks = printf(' ~%i', hmod)
 		endif
 		if hadd > 0
-			let hunks = printf('%s+%i', hunks, hadd)
+			let hunks = printf('%s +%i', hunks, hadd)
 		endif
 		if hdel > 0
-			let hunks = printf('%s-%i', hunks, hdel)
+			let hunks = printf('%s -%i', hunks, hdel)
 		endif
 		return hunks
 	endfunction

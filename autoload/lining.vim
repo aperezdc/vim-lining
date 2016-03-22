@@ -103,11 +103,11 @@ call lining#left(s:filename_item, 'BufName')
 let s:flags_item = {}
 function s:flags_item.format(item, active, bufnum)
 	let f = ''
-	if &readonly
+	if getbufvar(a:bufnum, '&readonly')
 		let f .= '~'
 	endif
-	if &modifiable
-		if &modified
+	if getbufvar(a:bufnum, '&modifiable')
+		if getbufvar(a:bufnum, '&modified')
 			let f .= '+'
 		endif
 	else
@@ -120,7 +120,7 @@ call lining#left(s:flags_item)
 " Paste status
 let s:paste_item = {}
 function s:paste_item.format(item, active, bufnum)
-	if a:active && &paste
+	if a:active && getbufvar(a:bufnum, '&paste')
 		return 'PASTE'
 	else
 		return ''
@@ -137,7 +137,7 @@ function s:git_branch_item.format(item, active, bufnum)
 	if exists('*fugitive#head')
 		let head = fugitive#head()
 		if empty(l:head) && exists('*fugitive#detect') && !exists('b:git_dir')
-			call fugitive#detect(getcwd())
+			call fugitive#detect(fnamemodify(bufname(a:bufnum), ':p:h'))
 			let head = fugitive#head()
 		endif
 		return head

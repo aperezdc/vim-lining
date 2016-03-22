@@ -1,3 +1,5 @@
+" vim: set foldmethod=marker
+"
 " Author: Adrián Pérez de Castro <aperez@igalia.com>
 " License: GPLv3
 
@@ -9,6 +11,21 @@ let g:loaded_lining_autoload = 1
 let s:save_cpo = &cpo
 set cpo&vim
 
+" Cache type codes. {{{1
+"
+" A Funcref attached directly to a dictionary may have a different type code
+" than an unattached function. Defining a dummy function in a Dict and using
+" it to obtain the type code is the safest way that works for Vim and NeoVim.
+"
+let s:dummy = {}
+function s:dummy.dummier()
+	return ''
+endfunction
+
+let s:TYPE_FREF = type(s:dummy.dummier)
+let s:TYPE_DICT = type({})
+
+unlet s:dummy  " Remove the dummy dictionary 1}}}
 
 let s:left_items = []
 let s:right_items = []
@@ -25,7 +42,7 @@ endfunction
 
 function s:add_item(lr, format, color)
 	let l:id = len(a:lr)
-	if type(a:format) == type({})
+	if type(a:format) == s:TYPE_DICT
 		" Assume it's a properly set up Dict
 		if a:color != ''
 			" Color override
@@ -46,7 +63,7 @@ endfunction
 function s:format(item, active, bufnum)
 	let hlgroup = 'Lining' . get(a:item, 'color', 'Item')
 	let text = ''
-	if type(a:item.format) == type(function('tr'))
+	if type(a:item.format) == s:TYPE_FREF
 		" Evaluate the formatting function
 		let text = a:item.format(a:item, a:active, a:bufnum)
 	else

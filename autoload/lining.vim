@@ -152,7 +152,17 @@ call lining#right('%4l:%-3c', 'LnCol')
 if exists('*GitGutterGetHunkSummary')
 	function s:git_get_hunks()
 		let [hadd, hmod, hdel] = GitGutterGetHunkSummary()
-		return printf('~%i+%i-%i', hmod, hadd, hdel)
+		let hunks = ''
+		if hmod > 0
+			let hunks = printf('~%i', hmod)
+		endif
+		if hadd > 0
+			let hunks = printf('%s+%i', hunks, hadd)
+		endif
+		if hdel > 0
+			let hunks = printf('%s-%i', hunks, hdel)
+		endif
+		return hunks
 	endfunction
 else
 	function s:git_get_hunks()

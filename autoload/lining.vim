@@ -43,12 +43,12 @@ function s:add_item(lr, format, color)
 endfunction
 
 
-function s:format(item, active)
+function s:format(item, active, bufnum)
 	let hlgroup = 'Lining' . get(a:item, 'color', 'Item')
 	let text = ''
 	if type(a:item.format) == type(function('tr'))
 		" Evaluate the formatting function
-		let text = a:item.format(a:item, a:active)
+		let text = a:item.format(a:item, a:active, a:bufnum)
 	else
 		let text = a:item.format
 	endif
@@ -83,8 +83,8 @@ endfunction
 
 " Buffer name
 let s:filename_item = { 'nospace': 1 }
-function s:filename_item.format(item, active)
-	let path = expand('%')
+function s:filename_item.format(item, active, bufnum)
+	let path = expand(bufname(a:bufnum))
 	if empty(path)
 		return '%< %f '
 	endif
@@ -101,7 +101,7 @@ call lining#left(s:filename_item, 'BufName')
 
 " File flags
 let s:flags_item = {}
-function s:flags_item.format(item, active)
+function s:flags_item.format(item, active, bufnum)
 	let f = ''
 	if &readonly
 		let f .= '~'
@@ -119,7 +119,7 @@ call lining#left(s:flags_item)
 
 " Paste status
 let s:paste_item = {}
-function s:paste_item.format(item, active)
+function s:paste_item.format(item, active, bufnum)
 	if a:active && &paste
 		return 'PASTE'
 	else
@@ -133,7 +133,7 @@ call lining#right('%4l:%-3c', 'LnCol')
 
 " Git branch
 let s:git_branch_item = {}
-function s:git_branch_item.format(item, active)
+function s:git_branch_item.format(item, active, bufnum)
 	if exists('*fugitive#head')
 		let head = fugitive#head()
 		if empty(l:head) && exists('*fugitive#detect') && !exists('b:git_dir')
@@ -173,7 +173,7 @@ function lining#status(winnum)
 
 	while i < n
 		let item = s:left_items[i]
-		let text = s:format(item, active)
+		let text = s:format(item, active, bufnum)
 		if !empty(text)
 			let hlgroup = 'Lining' . get(item, 'color', 'Item')
 			let item_color = synIDtrans(hlID(hlgroup))
@@ -200,7 +200,7 @@ function lining#status(winnum)
 	while i > 0
 		let i = i - 1
 		let item = s:right_items[i]
-		let text = s:format(item, active)
+		let text = s:format(item, active, bufnum)
 		if !empty(text)
 			let hlgroup = 'Lining' . get(item, 'color', 'Item')
 			let item_color = synIDtrans(hlID(hlgroup))

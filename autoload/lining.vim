@@ -252,6 +252,9 @@ endfunction
 
 
 function lining#refresh()
+	if pumvisible()
+		return
+	endif
 	for nr in range(1, winnr('$'))
 		call setwinvar(nr, '&statusline', '%!lining#status(' . nr . ')')
 	endfor

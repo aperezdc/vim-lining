@@ -148,20 +148,33 @@ call lining#left(s:paste_item, 'Warn')
 " Line/Column
 call lining#right('%4l:%-3c', 'LnCol')
 
-" Git branch
-let s:git_branch_item = {}
-function s:git_branch_item.format(item, active, bufnum)
-	if exists('*fugitive#head')
+" Git branch/hunk information
+if exists('*GitGutterGetHunkSummary')
+	function s:git_get_hunks()
+		let [hadd, hmod, hdel] = GitGutterGetHunkSummary()
+		return printf('~%i+%i-%i', hmod, hadd, hdel)
+	endfunction
+else
+	function s:git_get_hunks()
+		return ''
+	endfunction
+endif
+
+if exists('*fugitive#detect') && exists('*fugitive#detect')
+	let s:git_item = {}
+	function s:git_item.format(item, active, bufnum)
 		let head = fugitive#head()
-		if empty(l:head) && exists('*fugitive#detect') && !exists('b:git_dir')
+		if empty(head) && !exists('b:git_dir')
 			call fugitive#detect(fnamemodify(bufname(a:bufnum), ':p:h'))
 			let head = fugitive#head()
 		endif
-		return head
-	endif
-	return ''
-endfunction
-call lining#right(s:git_branch_item, 'VcsInfo')
+		if empty(head)
+			return ''
+		endif
+		return a:active ? (head . s:git_get_hunks()) : head
+	endfunction
+	call lining#right(s:git_item, 'VcsInfo')
+endif
 
 " File type
 call lining#right("%{empty(&filetype) ? 'none' : &filetype}")

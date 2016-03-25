@@ -1,4 +1,4 @@
-" vim: set foldmethod=marker
+" vim: set foldmethod=marker:
 "
 " Author: Adrián Pérez de Castro <aperez@igalia.com>
 " License: GPLv3
@@ -24,119 +24,90 @@ endfunction
 
 let s:TYPE_FREF = type(s:dummy.dummier)
 let s:TYPE_DICT = type({})
+let s:TYPE_NUM  = type(0)
 
 unlet s:dummy  " Remove the dummy dictionary 1}}}
 
-let s:left_items = []
-let s:right_items = []
+let s:lining_items = [ 0 ]
+let s:splitter_pos = 0
 
 
-function s:colorize(active, group, content)
-  if a:active
-    return '%#' . a:group . '#' . a:content . '%#StatusLine#'
-  else
-    return a:content
-  endif
-endfunction
-
-
-function s:add_item(lr, format, color)
-	let l:id = len(a:lr)
-	if type(a:format) == s:TYPE_DICT
-		" Assume it's a properly set up Dict
-		if a:color != ''
-			" Color override
-			let a:format.color = a:color
+function s:add_item(list, pos, item, hlgroup)
+	let hlg = 'LiningItem'
+	let fmt = {}
+	if type(a:item) == s:TYPE_DICT
+		let fmt = a:item
+		if has_key(fmt, 'color')
+			let hlg = 'Lining' . fmt.color
 		endif
-		call add(a:lr, a:format)
-	else
-		let v = { 'format': a:format }
-		if a:color != ''
-			let v.color = a:color
+		if a:hlgroup != ''
+			let hlg = a:hlgroup
 		endif
-		call add(a:lr, l:v)
-	endif
-	return l:id
-endfunction
-
-
-function s:format(item, active, bufnum)
-	let hlgroup = 'Lining' . get(a:item, 'color', 'Item')
-	let text = ''
-	if type(a:item.format) == s:TYPE_FREF
-		" Evaluate the formatting function
-		let text = a:item.format(a:item, a:active, a:bufnum)
+		let fmt.hlgroup = hlg
+		call insert(a:list, fmt, a:pos)
+	elseif !empty(a:hlgroup) && a:hlgroup != 'LiningItem'
+		call insert(a:list, { 'hlgroup': a:hlgroup, 'format': a:item }, a:pos)
 	else
-		let text = a:item.format
-	endif
-	if !empty(l:text)
-		if get(a:item, 'nospace', 0) == 0
-			let text = ' ' . text . ' '
-		endif
-		return s:colorize(a:active, hlgroup, text)
-	else
-		return ''
+		call insert(a:list, a:item, a:pos)
 	endif
 endfunction
 
 
 function lining#left(format, ...)
-	let color = 'Item'
-	if a:0 > 0
-		let color = a:1
-	endif
-	return s:add_item(s:left_items, a:format, color)
+	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
+	call s:add_item(s:lining_items, s:splitter_pos, a:format, hlgroup)
+	let s:splitter_pos += 1
 endfunction
 
 
 function lining#right(format, ...)
-	let color = 'Item'
-	if a:0 > 0
-		let color = a:1
-	endif
-	return s:add_item(s:right_items, a:format, color)
+	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
+	call s:add_item(s:lining_items, s:splitter_pos + 1, a:format, hlgroup)
 endfunction
 
 
 " Buffer name
-let s:filename_item = { 'nospace': 1 }
-function s:filename_item.format(item, active, bufnum)
+let s:filename_item = { 'color': 'BufName', 'autoformat': 0 }
+function s:filename_item.format(active, bufnum)
 	let path = expand(bufname(a:bufnum))
 	if empty(path)
 		return '%< %f '
 	endif
 	let path = fnamemodify(path, ':p:~:.:h')
 	if path == '.'
-		let path = '%< '
+		let path = ''
 	else
-		let path = '%< ' . path . '/'
+		let path .= '/'
 	endif
-	return s:colorize(a:active, 'LiningBufPath', path)
-				\ . s:colorize(a:active, 'LiningBufName', '%t ')
+	if a:active
+		return printf('%%#LiningBufPath#%%< %s%%#LiningBufName#%%t ', path)
+	else
+		return printf('%%< %s%%t ', path)
+	endif
 endfunction
-call lining#left(s:filename_item, 'BufName')
+call lining#left(s:filename_item)
 
 " File flags
 let s:flags_item = {}
-function s:flags_item.format(item, active, bufnum)
-	let f = ''
+function s:flags_item.format(active, bufnum)
+	let flags = ''
 	if getbufvar(a:bufnum, '&readonly')
-		let f .= '~'
+		let flags .= '~'
 	endif
 	if getbufvar(a:bufnum, '&modifiable')
 		if getbufvar(a:bufnum, '&modified')
-			let f .= '+'
+			let flags .= '+'
 		endif
 	else
-		let f .= '-'
+		let flags .= '-'
 	endif
-	return f
+	return flags
 endfunction
 call lining#left(s:flags_item)
 
 " Paste status
 let s:paste_item = {}
-function s:paste_item.format(item, active, bufnum)
+function s:paste_item.format(active, bufnum)
 	if a:active && getbufvar(a:bufnum, '&paste')
 		return 'PASTE'
 	else
@@ -172,7 +143,7 @@ endif
 
 if exists('*fugitive#detect') && exists('*fugitive#detect')
 	let s:git_item = {}
-	function s:git_item.format(item, active, bufnum)
+	function s:git_item.format(active, bufnum)
 		let head = fugitive#head()
 		if empty(head) && !exists('b:git_dir')
 			call fugitive#detect(fnamemodify(bufname(a:bufnum), ':p:h'))
@@ -199,63 +170,70 @@ function lining#status(winnum)
 	let name = bufname(bufnum)
 
 	if type ==# 'help'
-		let fmt .= s:colorize(active, 'LiningBufPath', ' help/')
-		let fmt .= s:colorize(active, 'LiningBufName', fnamemodify(name, ':t:r') . ' ')
-		let fmt .= '%='  " Move to the right side
-		let fmt .= s:colorize(active, 'LiningLnCol', ' %P ')
+		if active
+			let fmt .= '%#LiningBufPath# help/%#LiningBufName#'
+			let fmt .= fnamemodify(name, ':t:r')
+			let fmt .= ' %#StatusLine#%=%#LiningLnCol# %P '
+		else
+			let fmt .= ' help/'
+			let fmt .= fnamemodify(name, ':t:r')
+			let fmt .= ' %= %P '
+		endif
 		return fmt
 	endif
 
-	let i = 0
-	let n = len(s:left_items)
-	let last_color = -1
-	let start_color = 1
+	let last_hlgroup_id = -1
+	let start_hlgroup = 1
 
-	while i < n
-		let item = s:left_items[i]
-		let text = s:format(item, active, bufnum)
-		if !empty(text)
-			let hlgroup = 'Lining' . get(item, 'color', 'Item')
-			let item_color = synIDtrans(hlID(hlgroup))
-			if item_color == last_color
-				if start_color != 0
-					let fmt .= s:colorize(active, hlgroup, '·')
-				endif
-				let start_color = 0
-			else
-				let last_color = item_color
-				let start_color = 1
+	for item in s:lining_items
+		let autoformat = 1
+		let hlgroup = 'LiningItem'
+		let text = ''
+
+		if type(item) == s:TYPE_NUM && item == 0
+			let autoformat = 0
+			let hlgroup = active ? 'StatusLine' : 'StatusLineNC'
+			let text = active ? '%#StatusLine#%=' : '%#StatusLineNC#%='
+		elseif type(item) == s:TYPE_DICT
+			let hlgroup = item.hlgroup
+			let autoformat = get(item, 'autoformat', 1)
+			let text = (type(item.format) == s:TYPE_FREF)
+						\ ? item.format(active, bufnum) : item.format
+		else
+			let text = item
+		endif
+		unlet item
+
+		if empty(text)
+			continue
+		endif
+
+		let hlgroup_id = synIDtrans(hlID(hlgroup))
+		if hlgroup_id == last_hlgroup_id
+			" Next item has the same colors
+			if start_hlgroup
+				let fmt .= '·'
 			endif
+			let start_hlgroup = 0
+		else
+			" Next item has different colors.
+			if autoformat
+				let fmt .= '%#'
+				let fmt .= hlgroup
+				let fmt .= '#'
+			endif
+			let last_hlgroup_id = hlgroup_id
+			let start_hlgroup = 1
+		endif
+
+		if autoformat
+			let fmt .= ' '
+			let fmt .= text
+			let fmt .= ' '
+		else
 			let fmt .= text
 		endif
-		let i = i + 1
-	endwhile
-
-	let fmt .= '%='  " Switch to the right side
-
-	let i = len(s:right_items)
-	let last_color = -1
-	let start_color = 1
-
-	while i > 0
-		let i = i - 1
-		let item = s:right_items[i]
-		let text = s:format(item, active, bufnum)
-		if !empty(text)
-			let hlgroup = 'Lining' . get(item, 'color', 'Item')
-			let item_color = synIDtrans(hlID(hlgroup))
-			if item_color == last_color
-				if start_color != 0
-					let fmt .= s:colorize(active, hlgroup, '·')
-				endif
-				let start_color = 0
-			else
-				let last_color = item_color
-				let start_color = 1
-			endif
-			let fmt .= text
-		endif
-	endwhile
+	endfor
 
 	return fmt
 endfunction

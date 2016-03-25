@@ -80,14 +80,19 @@ endfunction
 
 
 " Buffer name
-let s:filename_item = { 'color': 'BufName', 'autoformat': 0 }
-function s:filename_item.format(active, bufnum)
+let s:buffername_item = { 'color': 'BufName', 'autoformat': 0 }
+function s:buffername_item.format(active, bufnum)
 	let type = getbufvar(a:bufnum, '&buftype')
+	let ft   = getbufvar(a:bufnum, '&filetype')
 	let path = bufname(a:bufnum)
 	let name = '%t'
 
 	if type ==# 'help'
 		let path = 'help/'
+	elseif ft ==# 'netrw'
+		let path = getbufvar(a:bufnum, 'netrw_curdir')
+		let name = fnamemodify(path, ':t')
+		let path = fnamemodify(path, ':p:~:.:h') . '/'
 	else
 		let path = expand(path)
 		if !empty(path)
@@ -106,8 +111,8 @@ function s:filename_item.format(active, bufnum)
 		return printf('%%< %s%%t ', path)
 	endif
 endfunction
-call lining#left(s:filename_item)
-call lining#altleft(s:filename_item)
+call lining#left(s:buffername_item)
+call lining#altleft(s:buffername_item)
 
 " File flags
 let s:flags_item = {}
@@ -185,20 +190,19 @@ call lining#right("%{empty(&filetype) ? 'none' : &filetype}")
 
 
 function lining#status(winnum)
-	let active = a:winnum == winnr()
 	let bufnum = winbufnr(a:winnum)
-
-	let fmt  = ''
-	let type = getbufvar(bufnum, '&buftype')
-	let name = bufname(bufnum)
+	let type   = getbufvar(bufnum, '&buftype')
+	let ft     = getbufvar(bufnum, '&filetype')
 
 	let item_list = s:lining_items
-	if type ==# 'help'
+	if type ==# 'help' || ft ==# 'netrw'
 		let item_list = s:lining_alt_items
 	endif
 
 	let last_hlgroup_id = -1
 	let start_hlgroup = 1
+	let active = a:winnum == winnr()
+	let fmt  = ''
 
 	for item in item_list
 		let autoformat = 1

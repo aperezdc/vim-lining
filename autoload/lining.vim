@@ -107,11 +107,11 @@ function s:filename_item.format(item, active, bufnum)
 	endif
 	let path = fnamemodify(path, ':p:~:.:h')
 	if path == '.'
-		let path = ' '
+		let path = '%< '
 	else
-		let path = ' ' . path . '/'
+		let path = '%< ' . path . '/'
 	endif
-	return s:colorize(a:active, 'LiningBufPath', path . '%<')
+	return s:colorize(a:active, 'LiningBufPath', path)
 				\ . s:colorize(a:active, 'LiningBufName', '%t ')
 endfunction
 call lining#left(s:filename_item, 'BufName')

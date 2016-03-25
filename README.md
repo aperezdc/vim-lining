@@ -16,6 +16,8 @@ theme](https://github.com/aperezdc/vim-elrond).)
 * Visual paste mode indicator (not shown in screenshot).
 * If you have [Fugitive](https://github.com/tpope/vim-fugitive) installed, it
   will be used to show information on Git repositories.
+* Alternate status line for certain kinds of buffer (for now, this covers help
+  buffers and the Netrw file browser).
 
 
 ## Customization
@@ -34,6 +36,11 @@ or, to prepend to the *left* of the right part of the status line:
 ```vim
 call lining#right("%{empty(PencilMode()) ? 'none' : PencilMode()}", 'Item')
 ```
+
+(There are also functions to add items to the alternate status line used e.g.
+for help buffers and the Netrw file browser: `lining#altleft()` and
+`lining#altright()`.)
+
 
 The first argument is either a `statusline` format specifier (like in the
 example above), or a `Dict` with a `format` function attribute. The item

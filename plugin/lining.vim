@@ -14,7 +14,7 @@ set showmode
 
 augroup lining
 	autocmd!
-	autocmd VimEnter,WinEnter,BufWinEnter,BufUnload,VimResized * call lining#refresh()
+	autocmd VimEnter,WinEnter,BufWinEnter,BufUnload,VimResized,FileType * call lining#refresh()
 augroup END
 
 let &cpo = s:save_cpo

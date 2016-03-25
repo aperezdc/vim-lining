@@ -106,9 +106,9 @@ function s:buffername_item.format(active, bufnum)
 	endif
 
 	if a:active
-		return printf('%%#LiningBufPath#%%< %s%%#LiningBufName#%%t ', path)
+		return printf('%%#LiningBufPath#%%< %s%%#LiningBufName#%s ', path, name)
 	else
-		return printf('%%< %s%%t ', path)
+		return printf('%%< %s%s ', path, name)
 	endif
 endfunction
 call lining#left(s:buffername_item)

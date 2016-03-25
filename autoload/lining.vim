@@ -31,6 +31,9 @@ unlet s:dummy  " Remove the dummy dictionary 1}}}
 let s:lining_items = [ 0 ]
 let s:splitter_pos = 0
 
+let s:lining_alt_items = [ 0 ]
+let s:splitter_alt_pos = 0
+
 
 function s:add_item(list, pos, item, hlgroup)
 	let hlg = 'LiningItem'
@@ -59,26 +62,44 @@ function lining#left(format, ...)
 	let s:splitter_pos += 1
 endfunction
 
-
 function lining#right(format, ...)
 	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
 	call s:add_item(s:lining_items, s:splitter_pos + 1, a:format, hlgroup)
+endfunction
+
+function lining#altleft(format, ...)
+	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
+	call s:add_item(s:lining_alt_items, s:splitter_alt_pos, a:format, hlgroup)
+	let s:splitter_alt_pos += 1
+endfunction
+
+function lining#altright(format, ...)
+	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
+	call s:add_item(s:lining_alt_items, s:splitter_alt_pos + 1, a:format, hlgroup)
 endfunction
 
 
 " Buffer name
 let s:filename_item = { 'color': 'BufName', 'autoformat': 0 }
 function s:filename_item.format(active, bufnum)
-	let path = expand(bufname(a:bufnum))
-	if empty(path)
-		return '%< %f '
-	endif
-	let path = fnamemodify(path, ':p:~:.:h')
-	if path == '.'
-		let path = ''
+	let type = getbufvar(a:bufnum, '&buftype')
+	let path = bufname(a:bufnum)
+	let name = '%t'
+
+	if type ==# 'help'
+		let path = 'help/'
 	else
-		let path .= '/'
+		let path = expand(path)
+		if !empty(path)
+			let path = fnamemodify(path, ':p:~:.:h')
+			if path == '.'
+				let path = ''
+			else
+				let path .= '/'
+			endif
+		endif
 	endif
+
 	if a:active
 		return printf('%%#LiningBufPath#%%< %s%%#LiningBufName#%%t ', path)
 	else
@@ -86,6 +107,7 @@ function s:filename_item.format(active, bufnum)
 	endif
 endfunction
 call lining#left(s:filename_item)
+call lining#altleft(s:filename_item)
 
 " File flags
 let s:flags_item = {}
@@ -118,6 +140,7 @@ call lining#left(s:paste_item, 'Warn')
 
 " Line/Column
 call lining#right('%4l:%-3c', 'LnCol')
+call lining#altright(' %P ', 'LnCol')
 
 " Git branch/hunk information
 if exists('*GitGutterGetHunkSummary')
@@ -169,23 +192,15 @@ function lining#status(winnum)
 	let type = getbufvar(bufnum, '&buftype')
 	let name = bufname(bufnum)
 
+	let item_list = s:lining_items
 	if type ==# 'help'
-		if active
-			let fmt .= '%#LiningBufPath# help/%#LiningBufName#'
-			let fmt .= fnamemodify(name, ':t:r')
-			let fmt .= ' %#StatusLine#%=%#LiningLnCol# %P '
-		else
-			let fmt .= ' help/'
-			let fmt .= fnamemodify(name, ':t:r')
-			let fmt .= ' %= %P '
-		endif
-		return fmt
+		let item_list = s:lining_alt_items
 	endif
 
 	let last_hlgroup_id = -1
 	let start_hlgroup = 1
 
-	for item in s:lining_items
+	for item in item_list
 		let autoformat = 1
 		let hlgroup = 'LiningItem'
 		let text = ''
@@ -217,7 +232,7 @@ function lining#status(winnum)
 			let start_hlgroup = 0
 		else
 			" Next item has different colors.
-			if autoformat
+			if autoformat && active
 				let fmt .= '%#'
 				let fmt .= hlgroup
 				let fmt .= '#'

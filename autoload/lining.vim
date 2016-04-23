@@ -143,6 +143,26 @@ function s:paste_item.format(active, bufnum)
 endfunction
 call lining#left(s:paste_item, 'Warn')
 
+" Buffer current/count
+let s:bufnum_item = {}
+function s:bufnum_item.format(active, bufnum)
+	if a:active
+		let lastbuf = bufnr('$')
+		let bufcount = 0
+		let i = 0
+		while i < lastbuf
+			let i = i + 1
+			if buflisted(i)
+				let bufcount = bufcount + 1
+			endif
+		endwhile
+		return (bufcount > 1) ? printf('%d/%d', bufnr('%'), bufcount) : ''
+	else
+		return ''
+	endif
+endfunction
+call lining#left(s:bufnum_item, 'StatusLine')
+
 " Line/Column
 call lining#right('%4l:%-3c', 'LnCol')
 call lining#altright(' %P ', 'LnCol')

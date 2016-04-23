@@ -195,7 +195,7 @@ function lining#status(winnum)
 	let ft     = getbufvar(bufnum, '&filetype')
 
 	let item_list = s:lining_items
-	if type ==# 'help' || ft ==# 'netrw'
+	if type ==# 'help' || type ==# 'nofile' || ft ==# 'netrw' || ft ==# 'vim-plug'
 		let item_list = s:lining_alt_items
 	endif
 

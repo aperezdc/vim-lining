@@ -183,6 +183,21 @@ if exists('*GitGutterGetHunkSummary')
 		endif
 		return hunks
 	endfunction
+elseif exists('g:signify_locked')
+	function s:git_get_hunks()
+		let [hadd, hmod, hdel] = sy#repo#get_stats()
+		let hunks = ''
+		if hmod > 0
+			let hunks = printf(' ~%i', hmod)
+		endif
+		if hadd > 0
+			let hunks = printf('%s +%i', hunks, hadd)
+		endif
+		if hdel > 0
+			let hunks = printf('%s -%i', hunks, hdel)
+		endif
+		return hunks
+	endfunction
 else
 	function s:git_get_hunks()
 		return ''

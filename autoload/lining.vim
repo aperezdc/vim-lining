@@ -183,7 +183,7 @@ if exists('*GitGutterGetHunkSummary')
 		endif
 		return hunks
 	endfunction
-elseif exists('g:signify_locked')
+elseif exists('g:loaded_signify')
 	function s:git_get_hunks()
 		let [hadd, hmod, hdel] = sy#repo#get_stats()
 		let hunks = ''

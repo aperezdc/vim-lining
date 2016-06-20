@@ -48,7 +48,7 @@ function! s:add_item(list, pos, item, hlgroup) abort
 		endif
 		let fmt.hlgroup = hlg
 		call insert(a:list, fmt, a:pos)
-	elseif !empty(a:hlgroup) && a:hlgroup != 'LiningItem'
+	elseif !empty(a:hlgroup) && a:hlgroup !=# 'LiningItem'
 		call insert(a:list, { 'hlgroup': a:hlgroup, 'format': a:item }, a:pos)
 	else
 		call insert(a:list, a:item, a:pos)

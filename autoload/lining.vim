@@ -35,7 +35,7 @@ let s:lining_alt_items = [ 0 ]
 let s:splitter_alt_pos = 0
 
 
-function s:add_item(list, pos, item, hlgroup)
+function! s:add_item(list, pos, item, hlgroup) abort
 	let hlg = 'LiningItem'
 	let fmt = {}
 	if type(a:item) == s:TYPE_DICT
@@ -56,24 +56,24 @@ function s:add_item(list, pos, item, hlgroup)
 endfunction
 
 
-function lining#left(format, ...)
+function! lining#left(format, ...) abort
 	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
 	call s:add_item(s:lining_items, s:splitter_pos, a:format, hlgroup)
 	let s:splitter_pos += 1
 endfunction
 
-function lining#right(format, ...)
+function! lining#right(format, ...) abort
 	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
 	call s:add_item(s:lining_items, s:splitter_pos + 1, a:format, hlgroup)
 endfunction
 
-function lining#altleft(format, ...)
+function! lining#altleft(format, ...) abort
 	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
 	call s:add_item(s:lining_alt_items, s:splitter_alt_pos, a:format, hlgroup)
 	let s:splitter_alt_pos += 1
 endfunction
 
-function lining#altright(format, ...)
+function! lining#altright(format, ...) abort
 	let hlgroup = (a:0 > 0) ? ('Lining' . a:1) : ''
 	call s:add_item(s:lining_alt_items, s:splitter_alt_pos + 1, a:format, hlgroup)
 endfunction
@@ -81,7 +81,7 @@ endfunction
 
 " Buffer name
 let s:buffername_item = { 'color': 'BufName', 'autoformat': 0 }
-function s:buffername_item.format(active, bufnum)
+function! s:buffername_item.format(active, bufnum) abort
 	let type = getbufvar(a:bufnum, '&buftype')
 	let ft   = getbufvar(a:bufnum, '&filetype')
 	let path = bufname(a:bufnum)
@@ -116,7 +116,7 @@ call lining#altleft(s:buffername_item)
 
 " File flags
 let s:flags_item = {}
-function s:flags_item.format(active, bufnum)
+function! s:flags_item.format(active, bufnum) abort
 	let flags = ''
 	if getbufvar(a:bufnum, '&readonly')
 		let flags .= '~'
@@ -134,7 +134,7 @@ call lining#left(s:flags_item)
 
 " Paste status
 let s:paste_item = {}
-function s:paste_item.format(active, bufnum)
+function! s:paste_item.format(active, bufnum) abort
 	if a:active && getbufvar(a:bufnum, '&paste')
 		return 'PASTE'
 	else
@@ -145,7 +145,7 @@ call lining#left(s:paste_item, 'Warn')
 
 " Buffer current/count
 let s:bufnum_item = {}
-function s:bufnum_item.format(active, bufnum)
+function! s:bufnum_item.format(active, bufnum) abort
 	if a:active
 		let lastbuf = bufnr('$')
 		let bufcount = 0
@@ -169,7 +169,7 @@ call lining#altright(' %P ', 'LnCol')
 
 " Git branch/hunk information
 if exists('*GitGutterGetHunkSummary')
-	function s:git_get_hunks()
+	function! s:git_get_hunks() abort
 		let [hadd, hmod, hdel] = GitGutterGetHunkSummary()
 		let hunks = ''
 		if hmod > 0
@@ -184,7 +184,7 @@ if exists('*GitGutterGetHunkSummary')
 		return hunks
 	endfunction
 elseif exists('g:loaded_signify')
-	function s:git_get_hunks()
+	function! s:git_get_hunks() abort
 		let [hadd, hmod, hdel] = sy#repo#get_stats()
 		let hunks = ''
 		if hmod > 0
@@ -199,14 +199,14 @@ elseif exists('g:loaded_signify')
 		return hunks
 	endfunction
 else
-	function s:git_get_hunks()
+	function! s:git_get_hunks() abort
 		return ''
 	endfunction
 endif
 
 if exists('*fugitive#detect') && exists('*fugitive#detect')
 	let s:git_item = {}
-	function s:git_item.format(active, bufnum)
+	function! s:git_item.format(active, bufnum) abort
 		let head = fugitive#head()
 		if empty(head) && !exists('b:git_dir')
 			call fugitive#detect(fnamemodify(bufname(a:bufnum), ':p:h'))
@@ -224,7 +224,7 @@ endif
 call lining#right("%{empty(&filetype) ? 'none' : &filetype}")
 
 
-function lining#status(winnum)
+function! lining#status(winnum) abort
 	let bufnum = winbufnr(a:winnum)
 	let type   = getbufvar(bufnum, '&buftype')
 	let ft     = getbufvar(bufnum, '&filetype')
@@ -293,7 +293,7 @@ function lining#status(winnum)
 endfunction
 
 
-function lining#refresh()
+function! lining#refresh() abort
 	if pumvisible()
 		return
 	endif

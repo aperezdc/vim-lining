@@ -43,7 +43,7 @@ function! s:add_item(list, pos, item, hlgroup) abort
 		if has_key(fmt, 'color')
 			let hlg = 'Lining' . fmt.color
 		endif
-		if a:hlgroup != ''
+		if !empty(a:hlgroup)
 			let hlg = a:hlgroup
 		endif
 		let fmt.hlgroup = hlg

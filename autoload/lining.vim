@@ -93,6 +93,9 @@ function! s:buffername_item.format(active, bufnum) abort
 		let path = getbufvar(a:bufnum, 'netrw_curdir')
 		let name = fnamemodify(path, ':t')
 		let path = fnamemodify(path, ':p:~:.:h') . '/'
+	elseif ft ==# 'dirvish'
+		let name = fnamemodify(path, ':t')
+		let path = fnamemodify(path, ':p:~:.:h') . '/'
 	else
 		let path = expand(path)
 		if !empty(path)

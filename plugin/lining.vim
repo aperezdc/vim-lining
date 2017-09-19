@@ -10,7 +10,9 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 set laststatus=2
-set showmode
+if get(g:, 'lining#showmode', 1)
+	set showmode
+endif
 
 augroup lining
 	autocmd!

@@ -117,24 +117,6 @@ endfunction
 call lining#left(s:buffername_item)
 call lining#altleft(s:buffername_item)
 
-" File flags
-let s:flags_item = {}
-function! s:flags_item.format(active, bufnum) abort
-	let flags = ''
-	if getbufvar(a:bufnum, '&readonly')
-		let flags .= '~'
-	endif
-	if getbufvar(a:bufnum, '&modifiable')
-		if getbufvar(a:bufnum, '&modified')
-			let flags .= '+'
-		endif
-	else
-		let flags .= '-'
-	endif
-	return flags
-endfunction
-call lining#left(s:flags_item)
-
 " Current mode (only if noshowmode is set)
 let s:mode_item = {
 			\ 'modemap': {
@@ -159,6 +141,24 @@ function! s:mode_item.format(active, bufnum) abort
 endfunction
 call lining#left(s:mode_item)
 call lining#altleft(s:mode_item)
+
+" File flags
+let s:flags_item = {}
+function! s:flags_item.format(active, bufnum) abort
+	let flags = ''
+	if getbufvar(a:bufnum, '&readonly')
+		let flags .= '~'
+	endif
+	if getbufvar(a:bufnum, '&modifiable')
+		if getbufvar(a:bufnum, '&modified')
+			let flags .= '+'
+		endif
+	else
+		let flags .= '-'
+	endif
+	return flags
+endfunction
+call lining#left(s:flags_item)
 
 " Paste status
 let s:paste_item = {}

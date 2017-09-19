@@ -10,7 +10,8 @@ theme](https://github.com/aperezdc/vim-elrond).)
 
 ## Features
 
-* Automatically sets the `laststatus=2` and `showmode` options for you.
+* Automatically sets the `laststatus=2` and `showmode` options for you. The
+  latter can be disabled by setting `g:lining#showmode=0`.
 * Possible, the smallest nice-looking status line which does not require you
   to install patched fonts.
 * Visual paste mode indicator (not shown in screenshot).

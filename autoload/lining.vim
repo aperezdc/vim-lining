@@ -135,6 +135,31 @@ function! s:flags_item.format(active, bufnum) abort
 endfunction
 call lining#left(s:flags_item)
 
+" Current mode (only if noshowmode is set)
+let s:mode_item = {
+			\ 'modemap': {
+			\     'v' : 'VISUAL',
+			\     'V' : 'VISUAL LINE',
+			\     '': 'VISUAL BLOCK',
+			\     'i' : 'INSERT',
+			\     'R' : 'REPLACE',
+			\     't' : 'TERM',
+			\     'cv': 'VEX',
+			\     'ce': 'EX',
+			\     'r' : 'ENTER?',
+			\     'rm': 'MORE?',
+			\     '!' : '<CMD>',
+			\   }
+			\ }
+function! s:mode_item.format(active, bufnum) abort
+	if &showmode || !a:active
+		return ''
+	endif
+	return get(s:mode_item.modemap, mode(), '')
+endfunction
+call lining#left(s:mode_item)
+call lining#altleft(s:mode_item)
+
 " Paste status
 let s:paste_item = {}
 function! s:paste_item.format(active, bufnum) abort

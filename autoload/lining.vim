@@ -235,10 +235,10 @@ endif
 if exists('*FugitiveDetect')
 	let s:git_item = {}
 	function! s:git_item.format(active, bufnum) abort
-		let head = fugitive#head()
+		let head = FugitiveHead()
 		if empty(head) && !exists('b:git_dir')
-			call fugitive#detect(fnamemodify(bufname(a:bufnum), ':p:h'))
-			let head = fugitive#head()
+			call FugitiveDetect(fnamemodify(bufname(a:bufnum), ':p:h'))
+			let head = FugitiveHead()
 		endif
 		if empty(head)
 			return ''

@@ -232,7 +232,7 @@ else
 	endfunction
 endif
 
-if exists('*fugitive#detect') && exists('*fugitive#detect')
+if exists('*FugitiveDetect')
 	let s:git_item = {}
 	function! s:git_item.format(active, bufnum) abort
 		let head = fugitive#head()
